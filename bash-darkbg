@@ -1,0 +1,56 @@
+#!/bin/sh
+##
+# Run the following command to set your prompt:
+# eval "`./bash-darkbg`"
+
+# Make test for root user.
+euid_decision() {
+	printf "%s" '`x="$(id -u)";if test "x$x" != x0;then printf '$1';else printf '$2';fi`'
+}
+
+# Control sequence introducer.
+csi="\\[\\e["
+
+# Control sequence introducer end.
+end="\\]"
+
+# Default ANSI escape sequence.
+def='0m'
+
+# Exit status of last command.
+status='`x=$?;if test "x$x" != x0;then printf "%s1;31m%s$x%s'$def'%s " '$csi' '$end' '$csi' '$end';fi`'
+
+# Background jobs.
+jobs='`x="$(jobs | wc -l)";if test "x$x" != x0;then printf "%s1;35m%s($x)%s'$def'%s " '$csi' '$end' '$csi' '$end';fi`'
+
+# Username.
+blue_or_red="`euid_decision 6 1`"
+user=$csi'1;3'"$blue_or_red"'m'$end'\u'$csi$def$end
+
+# "At" sign (@).
+at=$csi'1;30m'$end'@'$csi$def$end
+
+# Host machine.
+host=$csi'1;33m'$end'\h'$csi$def$end
+
+# Working directory.
+dir=$csi'1;30m'$end'\w'$csi$def$end
+
+# Prompt.
+green_or_red="`euid_decision 2 1`"
+tail=$csi'1;3'"$green_or_red"'m'$end'\$'$csi$def$end
+
+# Set prompt strings.
+PS1="$status$jobs$user$at$host $dir $tail "
+PS2="${csi}1;3${green_or_red}m$end>$csi$def$end "
+PS4="${csi}1;3${green_or_red}m$end+$csi$def$end "
+
+# Print command to change prompts.
+printf "%s\n" "PS1='$PS1' && PS2='$PS2' && PS4='$PS4'"
+
+# Unset variables.
+unset -f euid_decision
+unset -v csi end def status jobs blue_or_red user at host dir green_or_red tail
+
+# Exit.
+exit 0

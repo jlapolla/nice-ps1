@@ -1,0 +1,39 @@
+#!/bin/sh
+##
+# Run the following command to set your prompt:
+# eval "`./bash-nocolor`"
+
+# Exit status of last command.
+status='`x=$?;if test "x$x" != x0;then printf "$x ";fi`'
+
+# Background jobs.
+jobs='`x="$(jobs | wc -l)";if test "x$x" != x0;then printf "($x) ";fi`'
+
+# Username.
+user='\u'
+
+# "At" sign (@).
+at='@'
+
+# Host machine.
+host='\h'
+
+# Working directory.
+dir='\w'
+
+# Prompt.
+tail='\$'
+
+# Set prompt strings.
+PS1="$status$jobs$user$at$host $dir $tail "
+PS2="> "
+PS4="+ "
+
+# Print command to change prompts.
+printf "%s\n" "PS1='$PS1' && PS2='$PS2' && PS4='$PS4'"
+
+# Unset variables
+unset -v status jobs user at host dir tail
+
+# Exit.
+exit 0
